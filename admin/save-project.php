@@ -22,11 +22,12 @@ move_uploaded_file(
 );
 
 /* INSERT PROJECT */
-$conn->query("INSERT INTO projects (title, description, image, details, status, location)
-VALUES ('$title','$description','$cover_name','$details','$status','$location')");
+$result = pg_query($conn, "INSERT INTO projects (title, description, image, details, status, location)
+VALUES ('$title','$description','$cover_name','$details','$status','$location') RETURNING id");
 
 /* GET PROJECT ID */
-$project_id = $conn->insert_id;
+$row = pg_fetch_assoc($result);
+$project_id = $row['id'];
 
 
 /* SAVE ALL IMAGES */
@@ -39,7 +40,7 @@ foreach ($_FILES['images']['name'] as $key => $imageName) {
 
         move_uploaded_file($_FILES['images']['tmp_name'][$key], $target);
 
-        $conn->query("INSERT INTO project_images (project_id, image)
+        pg_query($conn, "INSERT INTO project_images (project_id, image)
         VALUES ('$project_id','$newName')");
     }
 }

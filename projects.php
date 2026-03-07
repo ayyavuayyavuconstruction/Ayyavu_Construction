@@ -7,8 +7,8 @@ if(isset($_GET['delete'])){
 $id = $_GET['delete'];
 
 /* GET COVER IMAGE */
-$get = mysqli_query($conn,"SELECT image FROM projects WHERE id=$id");
-$data = mysqli_fetch_assoc($get);
+$get = pg_query($conn,"SELECT image FROM projects WHERE id=$id");
+$data = pg_fetch_assoc($get);
 
 if($data){
 $image = $data['image'];
@@ -19,9 +19,9 @@ unlink("admin/uploads/".$image);
 }
 
 /* DELETE GALLERY IMAGES */
-$imgs = mysqli_query($conn,"SELECT image FROM project_images WHERE project_id=$id");
+$imgs = pg_query($conn,"SELECT image FROM project_images WHERE project_id=$id");
 
-while($row = mysqli_fetch_assoc($imgs)){
+while($row = pg_fetch_assoc($imgs)){
 if(file_exists("admin/uploads/".$row['image'])){
 unlink("admin/uploads/".$row['image']);
 }
@@ -29,8 +29,8 @@ unlink("admin/uploads/".$row['image']);
 
 /* DELETE DB RECORDS */
 
-mysqli_query($conn,"DELETE FROM project_images WHERE project_id=$id");
-mysqli_query($conn,"DELETE FROM projects WHERE id=$id");
+pg_query($conn,"DELETE FROM project_images WHERE project_id=$id");
+pg_query($conn,"DELETE FROM projects WHERE id=$id");
 
 exit("deleted");
 }
@@ -57,14 +57,14 @@ $filter = "WHERE status='$status'";
 
 /* TOTAL */
 
-$total = mysqli_query($conn,"SELECT COUNT(*) as total FROM projects $filter");
-$totalRow = mysqli_fetch_assoc($total);
+$total = pg_query($conn,"SELECT COUNT(*) as total FROM projects $filter");
+$totalRow = pg_fetch_assoc($total);
 $totalPages = ceil($totalRow['total']/$limit);
 
 
 /* GET PROJECTS */
 
-$result = mysqli_query($conn,"SELECT * FROM projects $filter ORDER BY id DESC LIMIT $start,$limit");
+$result = pg_query($conn,"SELECT * FROM projects $filter ORDER BY id DESC OFFSET $start LIMIT $limit");
 
 ?>
 
@@ -381,7 +381,7 @@ From luxury residential complexes to industrial hubs.
 
 <div class="projects-grid">
 
-<?php while($row = mysqli_fetch_assoc($result)) { ?>
+<?php while($row = pg_fetch_assoc($result)) { ?>
 
 <div class="project-card">
 

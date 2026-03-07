@@ -1170,9 +1170,9 @@ A transparent look into our active portfolio, showcasing the lifecycle of our co
 <?php
 
 $query = "SELECT * FROM projects ORDER BY id DESC LIMIT 3";
-$result = mysqli_query($conn,$query);
+$result = pg_query($conn,$query);
 
-while($row = mysqli_fetch_assoc($result)){
+while($row = pg_fetch_assoc($result)){
 
 ?>
 

@@ -2,8 +2,8 @@
 include("../config.php");
 
 $id = $_GET['id'];
-$project = mysqli_query($conn, "SELECT * FROM projects WHERE id=$id");
-$data = mysqli_fetch_assoc($project);
+$project = pg_query($conn, "SELECT * FROM projects WHERE id=$id");
+$data = pg_fetch_assoc($project);
 
 if($_POST) {
     $title = $_POST['title'];
@@ -11,24 +11,24 @@ if($_POST) {
     $details = $_POST['details'];
     $status = $_POST['status'];
     $location = $_POST['location'];
-    
+
     // Handle image upload if new image is provided
     if(!empty($_FILES['image']['name'])) {
         // Delete old image
         if(file_exists("uploads/" . $data['image'])) {
             unlink("uploads/" . $data['image']);
         }
-        
+
         $image = $_FILES['image']['name'];
         $newName = time() . "_" . $image;
         move_uploaded_file($_FILES['image']['tmp_name'], "uploads/" . $newName);
-        
+
         $updateQuery = "UPDATE projects SET title='$title', description='$description', details='$details', status='$status', location='$location', image='$newName' WHERE id=$id";
     } else {
         $updateQuery = "UPDATE projects SET title='$title', description='$description', details='$details', status='$status', location='$location' WHERE id=$id";
     }
-    
-    mysqli_query($conn, $updateQuery);
+
+    pg_query($conn, $updateQuery);
     header("Location: ../projects-new.php?admin=1");
     exit();
 }

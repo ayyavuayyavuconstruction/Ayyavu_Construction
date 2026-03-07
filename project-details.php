@@ -3,10 +3,10 @@ include("config.php");
 
 $id = $_GET['id'];
 
-$project = mysqli_query($conn,"SELECT * FROM projects WHERE id=$id");
-$data = mysqli_fetch_assoc($project);
+$project = pg_query($conn,"SELECT * FROM projects WHERE id=$id");
+$data = pg_fetch_assoc($project);
 
-$images = mysqli_query($conn,"SELECT * FROM project_images WHERE project_id=$id");
+$images = pg_query($conn,"SELECT * FROM project_images WHERE project_id=$id");
 ?>
 
 <!DOCTYPE html>
@@ -80,7 +80,7 @@ line-height:1.7;
 
 <div class="gallery">
 
-<?php while($img = mysqli_fetch_assoc($images)) { ?>
+<?php while($img = pg_fetch_assoc($images)) { ?>
 
 <img src="admin/uploads/<?php echo $img['image']; ?>">
 

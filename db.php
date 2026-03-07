@@ -1,7 +1,4 @@
 <?php
-$conn = mysqli_connect("localhost","root","","ayyavu_construction");
-
-if(!$conn){
-    die("Database Connection Failed");
-}
+// Use the same connection from config.php
+require_once 'config.php';
 ?>

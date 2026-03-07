@@ -6,27 +6,27 @@ if(isset($_GET['delete']) && isset($_GET['admin'])) {
     $id = $_GET['delete'];
     
     // Get cover image
-    $get = mysqli_query($conn, "SELECT image FROM projects WHERE id=$id");
-    $data = mysqli_fetch_assoc($get);
-    
+    $get = pg_query($conn, "SELECT image FROM projects WHERE id=$id");
+    $data = pg_fetch_assoc($get);
+
     if($data) {
         $image = $data['image'];
         if(file_exists("admin/uploads/".$image)) {
             unlink("admin/uploads/".$image);
         }
     }
-    
+
     // Delete gallery images
-    $imgs = mysqli_query($conn, "SELECT image FROM project_images WHERE project_id=$id");
-    while($row = mysqli_fetch_assoc($imgs)) {
+    $imgs = pg_query($conn, "SELECT image FROM project_images WHERE project_id=$id");
+    while($row = pg_fetch_assoc($imgs)) {
         if(file_exists("admin/uploads/".$row['image'])) {
             unlink("admin/uploads/".$row['image']);
         }
     }
-    
+
     // Delete DB records
-    mysqli_query($conn, "DELETE FROM project_images WHERE project_id=$id");
-    mysqli_query($conn, "DELETE FROM projects WHERE id=$id");
+    pg_query($conn, "DELETE FROM project_images WHERE project_id=$id");
+    pg_query($conn, "DELETE FROM projects WHERE id=$id");
     
     header("Location: projects-new.php?admin=1");
     exit();
@@ -45,12 +45,12 @@ if(isset($_GET['status']) && $_GET['status'] != "ALL PROJECTS") {
 }
 
 // Total count
-$total = mysqli_query($conn, "SELECT COUNT(*) as total FROM projects $filter");
-$totalRow = mysqli_fetch_assoc($total);
+$total = pg_query($conn, "SELECT COUNT(*) as total FROM projects $filter");
+$totalRow = pg_fetch_assoc($total);
 $totalPages = ceil($totalRow['total'] / $limit);
 
 // Get projects
-$result = mysqli_query($conn, "SELECT * FROM projects $filter ORDER BY id DESC LIMIT $start, $limit");
+$result = pg_query($conn, "SELECT * FROM projects $filter ORDER BY id DESC OFFSET $start LIMIT $limit");
 
 $isAdmin = isset($_GET['admin']);
 ?>
@@ -633,9 +633,9 @@ $isAdmin = isset($_GET['admin']);
         </div>
 
         <!-- Projects Grid -->
-        <?php if(mysqli_num_rows($result) > 0): ?>
+        <?php if(pg_num_rows($result) > 0): ?>
         <div class="projects-grid">
-            <?php while($project = mysqli_fetch_assoc($result)): ?>
+            <?php while($project = pg_fetch_assoc($result)): ?>
             <div class="project-card">
                 <img src="admin/uploads/<?php echo $project['image']; ?>" 
                      alt="<?php echo htmlspecialchars($project['title']); ?>" 
