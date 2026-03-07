@@ -5,6 +5,7 @@ $title = $_POST['title'];
 $description = $_POST['description'];
 $details = $_POST['details'];
 $status = $_POST['status'];
+$location = $_POST['location'] ?? '';
 
 /* LIMIT IMAGE UPLOAD */
 if(count($_FILES['images']['name']) > 5){
@@ -21,8 +22,8 @@ move_uploaded_file(
 );
 
 /* INSERT PROJECT */
-$conn->query("INSERT INTO projects (title, description, image, details, status)
-VALUES ('$title','$description','$cover_name','$details','$status')");
+$conn->query("INSERT INTO projects (title, description, image, details, status, location)
+VALUES ('$title','$description','$cover_name','$details','$status','$location')");
 
 /* GET PROJECT ID */
 $project_id = $conn->insert_id;
@@ -43,5 +44,6 @@ foreach ($_FILES['images']['name'] as $key => $imageName) {
     }
 }
 
-echo "Project Added Successfully";
+header("Location: ../projects-new.php?admin=1");
+exit();
 ?>

@@ -1,7 +1,43 @@
+<?php
+include("../config.php");
+
+$id = $_GET['id'];
+$project = mysqli_query($conn, "SELECT * FROM projects WHERE id=$id");
+$data = mysqli_fetch_assoc($project);
+
+if($_POST) {
+    $title = $_POST['title'];
+    $description = $_POST['description'];
+    $details = $_POST['details'];
+    $status = $_POST['status'];
+    $location = $_POST['location'];
+    
+    // Handle image upload if new image is provided
+    if(!empty($_FILES['image']['name'])) {
+        // Delete old image
+        if(file_exists("uploads/" . $data['image'])) {
+            unlink("uploads/" . $data['image']);
+        }
+        
+        $image = $_FILES['image']['name'];
+        $newName = time() . "_" . $image;
+        move_uploaded_file($_FILES['image']['tmp_name'], "uploads/" . $newName);
+        
+        $updateQuery = "UPDATE projects SET title='$title', description='$description', details='$details', status='$status', location='$location', image='$newName' WHERE id=$id";
+    } else {
+        $updateQuery = "UPDATE projects SET title='$title', description='$description', details='$details', status='$status', location='$location' WHERE id=$id";
+    }
+    
+    mysqli_query($conn, $updateQuery);
+    header("Location: ../projects-new.php?admin=1");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Add Project - Ayyavu Construction</title>
+    <title>Edit Project - Ayyavu Construction</title>
     <style>
         * {
             margin: 0;
@@ -82,6 +118,12 @@
             gap: 1rem;
         }
 
+        .current-image {
+            max-width: 200px;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
         .button-group {
             display: flex;
             gap: 1rem;
@@ -119,12 +161,6 @@
             background: #4b5563;
         }
 
-        .file-upload-info {
-            font-size: 0.875rem;
-            color: #6b7280;
-            margin-top: 0.25rem;
-        }
-
         @media (max-width: 768px) {
             .form-row {
                 grid-template-columns: 1fr;
@@ -139,59 +175,59 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Add New Project</h1>
-            <p>Create a new project entry for your portfolio</p>
+            <h1>Edit Project</h1>
+            <p>Update project information and details</p>
         </div>
 
-        <form action="save-project.php" method="POST" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data">
             <div class="form-row">
                 <div class="form-group">
                     <label>Project Title</label>
-                    <input type="text" name="title" placeholder="Enter project title" required>
+                    <input type="text" name="title" value="<?php echo htmlspecialchars($data['title']); ?>" required>
                 </div>
 
                 <div class="form-group">
                     <label>Location</label>
-                    <input type="text" name="location" placeholder="Chennai, Tamil Nadu">
+                    <input type="text" name="location" value="<?php echo htmlspecialchars($data['location'] ?? ''); ?>" placeholder="Chennai, Tamil Nadu">
                 </div>
             </div>
 
             <div class="form-group">
                 <label>Project Description</label>
-                <textarea name="description" placeholder="Brief description of the project" required></textarea>
+                <textarea name="description" required><?php echo htmlspecialchars($data['description']); ?></textarea>
             </div>
 
             <div class="form-group">
                 <label>Project Details</label>
-                <textarea name="details" placeholder="Detailed information about the project"></textarea>
+                <textarea name="details"><?php echo htmlspecialchars($data['details']); ?></textarea>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
                     <label>Project Status</label>
                     <select name="status" required>
-                        <option value="">Select Status</option>
-                        <option value="COMPLETED">Completed</option>
-                        <option value="ONGOING">Ongoing</option>
-                        <option value="UPCOMING">Upcoming</option>
+                        <option value="COMPLETED" <?php echo $data['status'] == 'COMPLETED' ? 'selected' : ''; ?>>Completed</option>
+                        <option value="ONGOING" <?php echo $data['status'] == 'ONGOING' ? 'selected' : ''; ?>>Ongoing</option>
+                        <option value="UPCOMING" <?php echo $data['status'] == 'UPCOMING' ? 'selected' : ''; ?>>Upcoming</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>Project Images</label>
-                    <input type="file" name="images[]" multiple accept="image/*" required>
-                    <div class="file-upload-info">
-                        Select multiple images (max 5). First image will be used as cover.
-                    </div>
+                    <label>Update Cover Image (Optional)</label>
+                    <input type="file" name="image" accept="image/*">
                 </div>
             </div>
 
+            <div class="form-group">
+                <label>Current Cover Image</label>
+                <img src="uploads/<?php echo $data['image']; ?>" alt="Current Image" class="current-image">
+            </div>
+
             <div class="button-group">
-                <button type="submit" class="btn btn-primary">Add Project</button>
+                <button type="submit" class="btn btn-primary">Update Project</button>
                 <a href="../projects-new.php?admin=1" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
     </div>
-
 </body>
 </html>
