@@ -1,0 +1,13 @@
+{
+  "name": "ayyavu-construction",
+  "version": "1.0.0",
+  "description": "Ayyavu Construction Company Website",
+  "scripts": {
+    "dev": "php -S localhost:8000",
+    "build": "echo 'No build step required for PHP project'",
+    "start": "php -S 0.0.0.0:8000"
+  },
+  "keywords": ["construction", "php", "website"],
+  "author": "Ayyavu Construction",
+  "license": "ISC"
+}
